@@ -2,24 +2,28 @@
 
 import { useState } from "react"
 import JsonViewer from "@/components/json-viewer"
-import "./globals.css" 
+import "./globals.css"
 
 export default function Page() {
   const [jsonInput, setJsonInput] = useState("")
-  const [parsedJson, setParsedJson] = useState<any | null>(null)
+  const [parsedJson, setParsedJson] = useState<unknown | null>(null)
   const [error, setError] = useState("")
 
   const handleJsonSubmit = () => {
     try {
-      const parsed = JSON.parse(jsonInput)
+      const parsed: unknown = JSON.parse(jsonInput)
       setParsedJson(parsed)
       setError("")
-    } catch (err: any) {
-      setError("Ugyldig JSON format: " + err.message)
+    } catch (err) {
+      if (err instanceof Error) {
+        setError("Ugyldig JSON format: " + err.message)
+      } else {
+        setError("Ugyldig JSON format")
+      }
       setParsedJson(null)
     }
   }
-//ee
+
   const handleClear = () => {
     setJsonInput("")
     setParsedJson(null)
@@ -27,35 +31,35 @@ export default function Page() {
   }
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>JSON</h1>
-      </header>
+      <div className="app">
+        <header className="app-header">
+          <h1>JSON</h1>
+        </header>
 
-      <div className="input-section">
+        <div className="input-section">
         <textarea
-          value={jsonInput}
-          onChange={(e) => setJsonInput(e.target.value)}
-          placeholder="Lim inn JSON-data her..."
-          className="json-input"
+            value={jsonInput}
+            onChange={(e) => setJsonInput(e.target.value)}
+            placeholder="Lim inn JSON-data her..."
+            className="json-input"
         />
-        <div className="button-group">
-          <button onClick={handleJsonSubmit} className="parse-button">
-            Parse JSON
-          </button>
-          <button onClick={handleClear} className="clear-button">
-            Tøm
-          </button>
+          <div className="button-group">
+            <button onClick={handleJsonSubmit} className="parse-button">
+              Parse JSON
+            </button>
+            <button onClick={handleClear} className="clear-button">
+              Tøm
+            </button>
+          </div>
+          {error && <div className="error">{error}</div>}
         </div>
-        {error && <div className="error">{error}</div>}
-      </div>
 
-      {parsedJson && (
-        <div className="viewer-section">
-          <h2>Navigerbar JSON</h2>
-          <JsonViewer data={parsedJson} />
-        </div>
-      )}
-    </div>
+        {parsedJson !== null && (
+            <div className="viewer-section">
+              <h2>Navigerbar JSON</h2>
+              <JsonViewer data={parsedJson} />
+            </div>
+        )}
+      </div>
   )
 }
