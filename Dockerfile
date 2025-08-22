@@ -11,7 +11,6 @@ RUN npm ci
 
 COPY next.config.ts tsconfig.json ./
 COPY app app
-COPY public public
 
 RUN npm run build
 
@@ -20,7 +19,6 @@ FROM gcr.io/distroless/nodejs20-debian11@sha256:8cf9967ae9ba1e64089f853abac42b41
 WORKDIR /app
 
 COPY --from=builder /app/.next/standalone /app
-COPY --from=builder /app/public /app/public
 
 EXPOSE 3000
 
