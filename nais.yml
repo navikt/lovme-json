@@ -1,0 +1,30 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+
+metadata:
+  labels:
+    team: medlemskap
+  name: lovme-json
+  namespace: medlemskap
+
+spec:
+  ingresses:
+    - https://lovme-json.intern.dev.nav.no
+  image: {{image}}
+  port: 3000
+  prometheus:
+    enabled: true
+    path: "/api/metrics"
+  idporten:
+    enabled: true
+    sidecar:
+      enabled: true
+      autoLogin: true
+  accessPolicy:
+    outbound:
+      rules:
+        - application: lovme-json
+        - application: nav-dekoratoren
+          namespace: personbruker
+  tokenx:
+    enabled: true
