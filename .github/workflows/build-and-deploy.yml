@@ -26,7 +26,7 @@ jobs:
       - name: Upload static files to NAV CDN
         uses: nais/deploy/actions/cdn-upload/v2@master
         with:
-          team: frontend-golden-path
+          team: medlemskap
           source: ./static
           destination: "/_next"
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
@@ -36,7 +36,7 @@ jobs:
         id: docker-push
         with:
           target: runtime
-          team: frontend-golden-path
+          team: medlemskap
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           build_secrets: NODE_AUTH_TOKEN=${{ secrets.READER_TOKEN }}
