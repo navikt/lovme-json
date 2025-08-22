@@ -19,7 +19,7 @@ export default function Page() {
       setParsedJson(null)
     }
   }
-//e
+//ee
   const handleClear = () => {
     setJsonInput("")
     setParsedJson(null)
