@@ -25,6 +25,7 @@ spec:
         claims:
           groups:
             - id: 29398a18-e5c3-4758-9001-56280e64f574
+            - id: 00783459-173e-4782-97e0-712a178825fc
 
       sidecar:
         enabled: true
