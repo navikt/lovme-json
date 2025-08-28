@@ -23,6 +23,12 @@ spec:
         claims:
           groups:
             - id: 29398a18-e5c3-4758-9001-56280e64f574
+
+      sidecar:
+        enabled: true
+        autoLogin: true
+        autoLoginIgnorePaths:
+
   accessPolicy:
     outbound:
       rules:
