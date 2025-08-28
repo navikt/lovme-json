@@ -10,6 +10,7 @@ metadata:
 spec:
   ingresses:
     - https://lovme-json.intern.dev.nav.no
+    - https://lovme-json.ansatt.dev.nav.no
   image: {{image}}
   port: 3000
   prometheus:
