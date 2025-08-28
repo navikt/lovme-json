@@ -15,9 +15,7 @@ spec:
   prometheus:
     enabled: true
     path: "/api/metrics"
-
-    spec:
-      azure:
+    azure:
         application:
           enabled: true
           allowAllUsers: false
