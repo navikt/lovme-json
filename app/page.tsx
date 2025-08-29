@@ -9,6 +9,43 @@ export default function Page() {
   const [parsedJson, setParsedJson] = useState<unknown | null>(null)
   const [error, setError] = useState("")
 
+  const anonymizeData = (data: unknown): unknown => {
+    if (data === null || data === undefined) {
+      return data
+    }
+
+    if (Array.isArray(data)) {
+      return data.map((item) => anonymizeData(item))
+    }
+
+    if (typeof data === "object") {
+      const obj = data as Record<string, unknown>
+      const anonymized: Record<string, unknown> = {}
+
+      for (const [key, value] of Object.entries(obj)) {
+        if (key === "fnr") {
+          anonymized[key] = "12345678910"
+        } else if (key === "fornavn") {
+          anonymized[key] = "Navn"
+        } else if (key === "etternavn") {
+          anonymized[key] = "Navnesen"
+        } else if (key === "organisasjonsnummer") {
+          anonymized[key] = "123"
+        } else if (key === "ident") {
+          anonymized[key] = "123"
+        } else if (key === "relatertVedSivilstand") {
+          anonymized[key] = "123"
+        } else {
+          anonymized[key] = anonymizeData(value)
+        }
+      }
+
+      return anonymized
+    }
+
+    return data
+  }
+
   const handleJsonSubmit = () => {
     try {
       const parsed: unknown = JSON.parse(jsonInput)
@@ -30,10 +67,42 @@ export default function Page() {
     setError("")
   }
 
+  const copyAnonymizedJson = async () => {
+    if (parsedJson) {
+      const anonymizedData = anonymizeData(parsedJson)
+      const jsonString = JSON.stringify(anonymizedData, null, 2)
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(jsonString)
+        } else {
+          const textArea = document.createElement("textarea")
+          textArea.value = jsonString
+          textArea.style.position = "fixed"
+          textArea.style.left = "-999999px"
+          textArea.style.top = "-999999px"
+          document.body.appendChild(textArea)
+          textArea.focus()
+          textArea.select()
+
+          const successful = document.execCommand("copy")
+          document.body.removeChild(textArea)
+
+          if (!successful) {
+            throw new Error("execCommand failed")
+          }
+        }
+      } catch (err) {
+        console.error("Kunne ikke kopiere til utklippstavle:", err)
+        prompt("Kunne ikke kopiere automatisk. Kopier denne teksten manuelt:", jsonString)
+      }
+    }
+  }
+
   return (
       <div className="app">
         <header className="app-header">
-          <h1>JSON</h1>
+          <h1>JSON Parser</h1>
         </header>
 
         <div className="input-section">
@@ -55,10 +124,26 @@ export default function Page() {
         </div>
 
         {parsedJson !== null && (
-            <div className="viewer-section">
-              <h2>Navigerbar JSON</h2>
-              <JsonViewer data={parsedJson} />
-            </div>
+            <>
+              <div className="viewer-section">
+                <h2>Navigerbar JSON</h2>
+                <JsonViewer data={parsedJson} />
+              </div>
+
+              <div className="anonymized-section">
+                <div className="section-header">
+                  <h2>Anonymisert JSON (rå format)</h2>
+                  <button onClick={copyAnonymizedJson} className="copy-button">
+                    Kopier til utklippstavle
+                  </button>
+                </div>
+                <textarea
+                    value={JSON.stringify(anonymizeData(parsedJson), null, 2)}
+                    readOnly
+                    className="anonymized-output"
+                />
+              </div>
+            </>
         )}
       </div>
   )
