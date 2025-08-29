@@ -29,12 +29,28 @@ export default function Page() {
           anonymized[key] = "Navn"
         } else if (key === "etternavn") {
           anonymized[key] = "Navnesen"
+        } else if (key === "navn") {
+          anonymized[key] = "Anonymisert Navn"
+        } else if (key === "bedriftsnavn" || key === "firmanavn" || key === "selskap") {
+          anonymized[key] = "Anonymisert Bedrift AS"
         } else if (key === "organisasjonsnummer") {
-          anonymized[key] = "123"
+          anonymized[key] = "123456789"
         } else if (key === "ident") {
           anonymized[key] = "123"
         } else if (key === "relatertVedSivilstand") {
           anonymized[key] = "123"
+        } else if (typeof value === "string") {
+          if (/^\d{9}$/.test(value)) {
+            anonymized[key] = "123456789"
+          }
+          else if (/^\d{11}$/.test(value)) {
+            anonymized[key] = "12345678910"
+          }
+          else if (/\b(AS|ASA|BA|SA|ANS|DA|ENK|NUF|KF|AL|FKF|IKS|SF|SL|BL)\b/i.test(value)) {
+            anonymized[key] = "Anonymisert Bedrift AS"
+          } else {
+            anonymized[key] = anonymizeData(value)
+          }
         } else {
           anonymized[key] = anonymizeData(value)
         }
