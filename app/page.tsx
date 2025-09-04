@@ -9,6 +9,39 @@ export default function Page() {
   const [parsedJson, setParsedJson] = useState<unknown | null>(null)
   const [error, setError] = useState("")
 
+  const extractAvklaringsliste = (data: unknown): string[] => {
+    const regelIds: string[] = []
+
+    const searchForAvklaringsliste = (obj: unknown): void => {
+      if (obj === null || obj === undefined) return
+
+      if (Array.isArray(obj)) {
+        obj.forEach((item) => searchForAvklaringsliste(item))
+      } else if (typeof obj === "object") {
+        const record = obj as Record<string, unknown>
+
+        // Check if this object has avklaringsListe or avklaringsliste
+        for (const [key, value] of Object.entries(record)) {
+          if (key.toLowerCase() === "avklaringsliste" && Array.isArray(value)) {
+            value.forEach((item) => {
+              if (typeof item === "object" && item !== null) {
+                const avklaringItem = item as Record<string, unknown>
+                if (avklaringItem.regel_id && typeof avklaringItem.regel_id === "string") {
+                  regelIds.push(avklaringItem.regel_id)
+                }
+              }
+            })
+          } else {
+            searchForAvklaringsliste(value)
+          }
+        }
+      }
+    }
+
+    searchForAvklaringsliste(data)
+    return regelIds
+  }
+
   const anonymizeData = (data: unknown): unknown => {
     if (data === null || data === undefined) {
       return data
@@ -141,6 +174,20 @@ export default function Page() {
 
         {parsedJson !== null && (
             <>
+              {(() => {
+                const avklaringsRegler = extractAvklaringsliste(parsedJson)
+                return avklaringsRegler.length > 0 ? (
+                    <div className="avklaringsliste-section">
+                      <h2>Avklaringsliste:</h2>
+                      <ul className="avklaringsliste">
+                        {avklaringsRegler.map((regelId, index) => (
+                            <li key={index}>{regelId}</li>
+                        ))}
+                      </ul>
+                    </div>
+                ) : null
+              })()}
+
               <div className="viewer-section">
                 <h2>Navigerbar JSON</h2>
                 <JsonViewer data={parsedJson} />
