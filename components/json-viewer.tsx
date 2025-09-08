@@ -1,6 +1,6 @@
 "use client"
 
-import { JSX, useState } from "react"
+import { type JSX, useState } from "react"
 import "./json-viewer.css"
 
 interface JsonViewerProps {
